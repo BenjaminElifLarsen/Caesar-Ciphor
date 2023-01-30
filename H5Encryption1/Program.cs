@@ -13,27 +13,30 @@ using Test;
 
 var sf1 = Caesar.FormatMessage(File.ReadAllText("song 1.txt"));
 var se1 = Caesar.Encrypt(sf1, 4);
-Console.WriteLine(se1);
+//Console.WriteLine(se1);
 //Console.WriteLine(Caesar.Decrypt(se1, 4));
 
 Console.WriteLine();
 
 var sf2 = Caesar.FormatMessage(File.ReadAllText("song 2.txt"));
 var se2 = Caesar.Encrypt(sf2, 15);
-Console.WriteLine(se2);
+//Console.WriteLine(se2);
 //Console.WriteLine(Caesar.Decrypt(se2,15));
 
 
-var brutes = CaesarAnalysis.BruteForce(se1);
-foreach(var t in brutes.Keys)
-{
-    Console.WriteLine($"{t}: " + brutes[t]);
-    Console.WriteLine();
-}
+//var brutes = CaesarAnalysis.BruteForce(se1);
+//foreach(var t in brutes.Keys)
+//{
+//    Console.WriteLine($"{t}: " + brutes[t]);
+//    Console.WriteLine();
+//}
 
-var text = se1;
-var key = CaesarAnalysis.FindPossibleKey(text);
+var text = se2;
+var keys = CaesarAnalysis.FindPossibleKeys(text);
+var key = keys.OrderByDescending(x => x.Value).First().Key;
 Console.WriteLine($"{key}: " + Caesar.Decrypt(text, key));
+
+
 
 namespace Test
 {
@@ -49,7 +52,7 @@ namespace Test
             return dic;
         }
 
-        public static byte FindPossibleKey(string decrypted)
+        public static Dictionary<byte, double> FindPossibleKeys(string decrypted)
         {
             var freqNorm = new double[]
             { //letters, A-Z
@@ -62,7 +65,18 @@ namespace Test
             var groupping = noSpace.GroupBy(x => x);
             var mostCommon = groupping.OrderByDescending(x => x.Count()).First().Key;
             var difference = (byte)(mostCommon - 'E');
-            return difference;
+
+            var orderGroupping = groupping.OrderBy(x => x.Key).ToArray();
+            var differences = new List<byte>();
+            var dic = new Dictionary<byte, double>();
+            foreach(var key in orderGroupping)
+            {
+                var alphabetDifference = (byte)(key.Key - 'A');
+                var chosenFreq = freqNorm[alphabetDifference];
+                dic.Add(alphabetDifference, chosenFreq);
+            }
+
+            return dic;
         }
     }
 
