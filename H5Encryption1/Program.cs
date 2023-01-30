@@ -22,7 +22,7 @@ var sf2 = Caesar.FormatMessage(File.ReadAllText("song 2.txt"));
 //}
 
 var plain = sf1;
-var text = Caesar.Encrypt(plain,25);
+var text = Caesar.Encrypt(plain,1);
 var key = CaesarAnalysis.FindPossibleKey(text);
 Console.WriteLine($"{key}: " + Caesar.Decrypt(text, key));
 
@@ -77,6 +77,7 @@ namespace Test
                 //The most common letter is the index of max, however, x.key is given in ancii and the index value is just the letter number (starting from 0) so to get the amount of times the letters have been shifted. 
                 //currently it can overflow and the fix to the underflow causes problems with 0 and 26 (no shift and shiften back to the plaintext), and should be fixed in proper production code, but it does work for all permitted keys (1-25)
                 //do note this is only for the most likely key (so the index freqNorm == 1). It is for the rest the code need some fixing.
+                //consider subtracting the 'A' from the x.Key first, since that part of the math makes more sense together, converting first and then deal with the index 
                 var keyAmount = groupping.Select(x => { return new {Key = (byte)(x.Key - ('A' + index)) < 26 ? (byte)(x.Key - ('A' + index)) : (byte)(x.Key - ('A' + index))-(255-25), Amount = x.Count() }; }).ToArray();
                 possibleKeys.Add((byte)keyAmount.OrderByDescending(x => x.Amount).First().Key); //the key that is used the most is chosen. 
             } //improve the groupping selects as they can underflow, e.g. A - (A+4)
