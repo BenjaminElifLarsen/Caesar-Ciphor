@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
 var f = Caesar.FormatMessage("ab ^ c | z");
-var e = Caesar.Encrypt(f, 23);
-var d = Caesar.Decrypt(e, 23);
+var e = Caesar.Encrypt(f, 15);
+var d = Caesar.Decrypt(e, 15);
 Console.WriteLine(f);
 Console.WriteLine(e);
 Console.WriteLine(d);
@@ -18,12 +18,11 @@ public static class Caesar
         {
             if (regex.IsMatch(c.ToString()))
             {
-                formatted += (char)c;
+                if(!(formatted.Any() && formatted.Last() == ' ' && c == ' '))
+                {
+                    formatted += (char)c;
+                }
             }
-            //if(formatted.Last() == ' ')
-            //{
-            //    formatted.Remove(formatted.Length- 1, 1);
-            //}
         }
         return formatted;
     }
