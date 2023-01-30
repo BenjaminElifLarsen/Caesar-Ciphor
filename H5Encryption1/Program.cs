@@ -22,13 +22,13 @@ var sf2 = Caesar.FormatMessage(File.ReadAllText("song 2.txt"));
 //}
 
 var plain = sf1;
-var text = Caesar.Encrypt(plain,5);
+var text = Caesar.Encrypt(plain,25);
 var key = CaesarAnalysis.FindPossibleKey(text);
 Console.WriteLine($"{key}: " + Caesar.Decrypt(text, key));
 
-Console.WriteLine();
-var secondBestKey = CaesarAnalysis.FindPossibleKeys(text).ToArray()[1];
-Console.WriteLine($"{secondBestKey}: " + Caesar.Decrypt(text, secondBestKey));
+//Console.WriteLine();
+//var secondBestKey = CaesarAnalysis.FindPossibleKeys(text).ToArray()[1];
+//Console.WriteLine($"{secondBestKey}: " + Caesar.Decrypt(text, secondBestKey));
 
 namespace Test
 {
@@ -72,9 +72,13 @@ namespace Test
                 var remainedFreq = freqNorm.Where(x => !listOfCalculatedFreq.Any(xx => x == xx));
                 var max = remainedFreq.Max();
                 listOfCalculatedFreq.Add(max);
-                var index = freqNormList.IndexOf(max);
-                var keyAmount = groupping.Select(x => { return new {Key = (byte)(x.Key - ('A' + index)) < 26 ? (byte)(x.Key - ('A' + index)) : (byte)(x.Key - ('A' + index))-(255-26), Amount = x.Count() }; }).ToArray();
-                possibleKeys.Add((byte)keyAmount.OrderByDescending(x => x.Amount).First().Key);
+                var index = freqNormList.IndexOf(max); //the below code gets the difference between each key (subtracting the ansii value to convert it to a decryption key) and the index of the max freq norm.
+                //should be rewritten to be more clean and most likely converted to a loop for improving some checks 
+                //The most common letter is the index of max, however, x.key is given in ancii and the index value is just the letter number (starting from 0) so to get the amount of times the letters have been shifted. 
+                //currently it can overflow and the fix to the underflow causes problems with 0 and 26 (no shift and shiften back to the plaintext), and should be fixed in proper production code, but it does work for all permitted keys (1-25)
+                //do note this is only for the most likely key (so the index freqNorm == 1). It is for the rest the code need some fixing.
+                var keyAmount = groupping.Select(x => { return new {Key = (byte)(x.Key - ('A' + index)) < 26 ? (byte)(x.Key - ('A' + index)) : (byte)(x.Key - ('A' + index))-(255-25), Amount = x.Count() }; }).ToArray();
+                possibleKeys.Add((byte)keyAmount.OrderByDescending(x => x.Amount).First().Key); //the key that is used the most is chosen. 
             } //improve the groupping selects as they can underflow, e.g. A - (A+4)
 
             return possibleKeys;
