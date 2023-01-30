@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Test;
 
 var f = Caesar.FormatMessage("ab ^ c | z");
 var e = Caesar.Encrypt(f, 15);
@@ -8,63 +9,66 @@ Console.WriteLine(e);
 Console.WriteLine(d);
 
 
-public static class Caesar
+namespace Test
 {
-    public static string FormatMessage(string message)
+    public static class Caesar
     {
-        Regex regex = new("[\\w ]");
-        var formatted = "";
-        foreach(var c in message.ToUpper())
+        public static string FormatMessage(string message)
         {
-            if (regex.IsMatch(c.ToString()))
+            Regex regex = new("[\\w ]");
+            var formatted = "";
+            foreach (var c in message.ToUpper())
             {
-                if(!(formatted.Any() && formatted.Last() == ' ' && c == ' '))
+                if (regex.IsMatch(c.ToString()))
                 {
-                    formatted += (char)c;
+                    if (!(formatted.Any() && formatted.Last() == ' ' && c == ' '))
+                    {
+                        formatted += (char)c;
+                    }
                 }
             }
+            return formatted;
         }
-        return formatted;
-    }
 
-    public static string Encrypt(string message, byte key)
-    {
-        if (key == 0 || key >= 26)
-            throw new Exception();
-        return Coder(message, key);
-    }
-
-    public static string Decrypt(string message, byte key)
-    {
-        if (key == 0 || key >= 26)
-            throw new Exception();
-        return Coder(message, -key);
-    }
-
-    private static string Coder(string message, int key)
-    {
-        string encrypted = "";
-        foreach (var c in message)
+        public static string Encrypt(string message, byte key)
         {
-            if (c != ' ')
-            {
-                var ce = (char)(c + key);
-                if (ce > 90)
-                {
-                    ce = (char)(ce - 26);
-                }
-                else if(ce < 65)
-                {
-                    ce = (char)(ce + 26);
-                }
-                encrypted += ce;
-            }
-            else
-            {
-                encrypted += c;
-            }
+            if (key == 0 || key >= 26)
+                throw new Exception();
+            return Coder(message, key);
         }
-        return encrypted;
-    }
 
+        public static string Decrypt(string message, byte key)
+        {
+            if (key == 0 || key >= 26)
+                throw new Exception();
+            return Coder(message, -key);
+        }
+
+        private static string Coder(string message, int key)
+        {
+            string encrypted = "";
+            foreach (var c in message)
+            {
+                if (c != ' ')
+                {
+                    var ce = (char)(c + key);
+                    if (ce > 90)
+                    {
+                        ce = (char)(ce - 26);
+                    }
+                    else if (ce < 65)
+                    {
+                        ce = (char)(ce + 26);
+                    }
+                    encrypted += ce;
+                }
+                else
+                {
+                    encrypted += c;
+                }
+            }
+            return encrypted;
+        }
+
+    }
 }
