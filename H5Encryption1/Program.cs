@@ -34,11 +34,13 @@ var sf2 = Caesar.FormatMessage(File.ReadAllText("song 2.txt"));
 
 var plain = sf1;
 var text = Caesar.Encrypt(plain,5);
-var keys = CaesarAnalysis.FindPossibleKeys(text);
+var key = CaesarAnalysis.FindPossibleKey(text);
 //var key = keys.OrderByDescending(x => x.Value).First().Key;
-Console.WriteLine($"{keys}: " + Caesar.Decrypt(text, keys));
+Console.WriteLine($"{key}: " + Caesar.Decrypt(text, key));
 //Console.WriteLine(plain);
-
+Console.WriteLine();
+var secondBestKey = CaesarAnalysis.FindPossibleKeys(text).ToArray()[1];
+Console.WriteLine($"{secondBestKey}: " + Caesar.Decrypt(text, secondBestKey));
 
 namespace Test
 {
@@ -54,7 +56,12 @@ namespace Test
             return dic;
         }
 
-        public static byte FindPossibleKeys(string decrypted)
+        public static byte FindPossibleKey(string toDecrypt)
+        {
+            return FindPossibleKeys(toDecrypt).First();
+        }
+
+        public static List<byte> FindPossibleKeys(string toDecrypt)
         {
             var freqNorm = new double[]
             { //letters, A-Z
@@ -63,13 +70,30 @@ namespace Test
                 0.53133, 0.59101, 0.15187, 0.00748, 0.47134, 0.49811, 0.71296,
                 0.21713, 0.07700, 0.18580, 0.01181, 0.15541, 0.00583
             };
-            var noSpace = decrypted.Where(c => c != ' ');
+            var noSpace = toDecrypt.Where(c => c != ' ');
             var groupping = noSpace.GroupBy(x => x);
-            var freqMax = freqNorm.Max();
-            var maxIndex = freqNorm.ToList().IndexOf(freqMax);
-            var keysAndAmounts = groupping.Select(x => { return new {Key = (byte)(x.Key - ('A' + maxIndex)), Amount = x.Count() }; });
-            var foundKey = keysAndAmounts.OrderByDescending(x => x.Amount).First().Key;
-            return foundKey;
+            //var freqMax = freqNorm.Max();
+            //var maxIndex = freqNorm.ToList().IndexOf(freqMax);
+            //var keysAndAmounts = groupping.Select(x => { return new {Key = (byte)(x.Key - ('A' + maxIndex)), Amount = x.Count() }; }); //can underflow
+            //var foundKey = keysAndAmounts.OrderByDescending(x => x.Amount).First().Key;
+            
+            
+            //rewrite this function so it return all keys in the order of most likely to less likely, so will need to get the index of each freqnorm
+            var freqNormList = freqNorm.ToList();
+            //calculate the index of each value 
+            var listOfCalculatedFreq = new List<double>();
+            var possibleKeys = new List<byte>();
+            foreach(var freq in freqNormList)
+            {
+                var remainedFreq = freqNorm.Where(x => !listOfCalculatedFreq.Any(xx => x == xx));
+                var max = remainedFreq.Max();
+                listOfCalculatedFreq.Add(max);
+                var index = freqNormList.IndexOf(max);
+                var keyAmount = groupping.Select(x => { return new {Key = (byte)(x.Key - ('A' + index)) < 26 ? (byte)(x.Key - ('A' + index)) : (byte)(x.Key - ('A' + index))-(255-26), Amount = x.Count() }; }).ToArray();
+                possibleKeys.Add((byte)keyAmount.OrderByDescending(x => x.Amount).First().Key);
+            } //improve the groupping selects as they can underflow, e.g. A - (A+4)
+
+            return possibleKeys;
         }
     }
 
