@@ -1,16 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Test;
-
-//var f = Caesar.FormatMessage("ab ^ c | z");
-//var e = Caesar.Encrypt(f, 15);
-//var d = Caesar.Decrypt(e, 15);
-//Console.WriteLine(f);
-//Console.WriteLine(e);
-//Console.WriteLine(d);
-
-
-
 
 var sf1 = Caesar.FormatMessage(File.ReadAllText("song 1.txt"));
 //var se1 = Caesar.Encrypt(sf1, 4);
@@ -35,9 +24,8 @@ var sf2 = Caesar.FormatMessage(File.ReadAllText("song 2.txt"));
 var plain = sf1;
 var text = Caesar.Encrypt(plain,5);
 var key = CaesarAnalysis.FindPossibleKey(text);
-//var key = keys.OrderByDescending(x => x.Value).First().Key;
 Console.WriteLine($"{key}: " + Caesar.Decrypt(text, key));
-//Console.WriteLine(plain);
+
 Console.WriteLine();
 var secondBestKey = CaesarAnalysis.FindPossibleKeys(text).ToArray()[1];
 Console.WriteLine($"{secondBestKey}: " + Caesar.Decrypt(text, secondBestKey));
@@ -72,10 +60,6 @@ namespace Test
             };
             var noSpace = toDecrypt.Where(c => c != ' ');
             var groupping = noSpace.GroupBy(x => x);
-            //var freqMax = freqNorm.Max();
-            //var maxIndex = freqNorm.ToList().IndexOf(freqMax);
-            //var keysAndAmounts = groupping.Select(x => { return new {Key = (byte)(x.Key - ('A' + maxIndex)), Amount = x.Count() }; }); //can underflow
-            //var foundKey = keysAndAmounts.OrderByDescending(x => x.Amount).First().Key;
             
             
             //rewrite this function so it return all keys in the order of most likely to less likely, so will need to get the index of each freqnorm
