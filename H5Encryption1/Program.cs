@@ -38,20 +38,24 @@ var sf2 = Caesar.FormatMessage(File.ReadAllText("song 2.txt"));
 //Console.WriteLine(encrypted);
 //var decrypted = Vigenere.Decrypt(encrypted, "T");
 //Console.WriteLine(decrypted);
-Tester("ABCDEFGHIJKLMNZ", "A");
-Tester("ABCDEFGHIJKLMNZ", "B");
-Tester("ABCDEFGHIJKLMNZ", "C");
-Tester("ABCDEFGHIJKLMNZ", "ABC");
-Tester("ABCDEFGHIJKLMNZ", "T");
-static void Tester(string message, string key)
-{
-    Console.WriteLine($"Message: {message}");
-    Console.WriteLine($"Key: {key}");
-    var encrypted = Vigenere.Encrypt(message, key);
-    Console.WriteLine($"Encrypted: {encrypted}");
-    var decrypted = Vigenere.Decrypt(encrypted, key);
-    Console.WriteLine($"Decrypted: {decrypted}{Environment.NewLine}");
-}
+
+//Tester("ABCDEFGHIJKLMNZ", "A");
+//Tester("ABCDEFGHIJKLMNZ", "B");
+//Tester("ABCDEFGHIJKLMNZ", "C");
+//Tester("ABCDEFGHIJKLMNZ", "ABC");
+//Tester("ABCDEFGHIJKLMNZ", "T");
+//static void Tester(string message, string key)
+//{
+//    Console.WriteLine($"Message: {message}");
+//    Console.WriteLine($"Key: {key}");
+//    var encrypted = Vigenere.Encrypt(message, key);
+//    Console.WriteLine($"Encrypted: {encrypted}");
+//    var decrypted = Vigenere.Decrypt(encrypted, key);
+//    Console.WriteLine($"Decrypted: {decrypted}{Environment.NewLine}");
+//}
+
+VigenereAnalysis.FindPossibleKey(Vigenere.Encrypt(Caesar.FormatMessage(sf1), "ABCD"),10);
+//VigenereAnalysis.FindPossibleKey("AABBAABBCCDDTHISISATESTTESTINGSOMETHINGHERETESTESTEST");
 
 namespace Test
 {
