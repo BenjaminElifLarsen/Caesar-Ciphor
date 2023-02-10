@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using H5Encryption1;
+using System.Text.RegularExpressions;
 using Test;
 
 var sf1 = Caesar.FormatMessage(File.ReadAllText("song 1.txt"));
@@ -21,14 +22,36 @@ var sf2 = Caesar.FormatMessage(File.ReadAllText("song 2.txt"));
 //    Console.WriteLine();
 //}
 
-var plain = sf1;
-var text = Caesar.Encrypt(plain,1);
-var key = CaesarAnalysis.FindPossibleKey(text);
-Console.WriteLine($"{key}: " + Caesar.Decrypt(text, key));
+//var plain = sf1;
+//var text = Caesar.Encrypt(plain,1);
+//var key = CaesarAnalysis.FindPossibleKey(text);
+//Console.WriteLine($"{key}: " + Caesar.Decrypt(text, key));
 
 //Console.WriteLine();
 //var secondBestKey = CaesarAnalysis.FindPossibleKeys(text).ToArray()[1];
 //Console.WriteLine($"{secondBestKey}: " + Caesar.Decrypt(text, secondBestKey));
+
+
+//Console.WriteLine(Vigenere.Encrypt("AAAA", "AB"));
+//Console.WriteLine(Vigenere.Encrypt("This is a test", "A"));
+//var encrypted = Vigenere.Encrypt("ABCDEFGHIJKLMN", "T");
+//Console.WriteLine(encrypted);
+//var decrypted = Vigenere.Decrypt(encrypted, "T");
+//Console.WriteLine(decrypted);
+Tester("ABCDEFGHIJKLMNZ", "A");
+Tester("ABCDEFGHIJKLMNZ", "B");
+Tester("ABCDEFGHIJKLMNZ", "C");
+Tester("ABCDEFGHIJKLMNZ", "ABC");
+Tester("ABCDEFGHIJKLMNZ", "T");
+static void Tester(string message, string key)
+{
+    Console.WriteLine($"Message: {message}");
+    Console.WriteLine($"Key: {key}");
+    var encrypted = Vigenere.Encrypt(message, key);
+    Console.WriteLine($"Encrypted: {encrypted}");
+    var decrypted = Vigenere.Decrypt(encrypted, key);
+    Console.WriteLine($"Decrypted: {decrypted}{Environment.NewLine}");
+}
 
 namespace Test
 {
@@ -108,14 +131,14 @@ namespace Test
 
         public static string Encrypt(string message, byte key)
         {
-            if (key == 0 || key >= 26)
+            if (key < 0 || key >= 26)
                 throw new Exception();
             return Coder(message, key);
         }
 
         public static string Decrypt(string message, byte key)
         {
-            if (key == 0 || key >= 26)
+            if (key < 0 || key >= 26)
                 throw new Exception();
             return Coder(message, -key);
         }
