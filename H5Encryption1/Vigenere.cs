@@ -100,13 +100,42 @@ namespace H5Encryption1
             //if key e.g. is 4, look at 0, 4, 8, 12 etc and count each letter. Then shift to the next location and count again, 1, 5, 9, 13 etc, then again 2, 6, 10, 14 and finally 3, 7, 11 and 15
             //if key e.g. is 2, look at 0, 2, 4, 6 and then shift with one, 1, 3, 5, 7
             foreach(var keyRange in possibleKeyRanges)
-            { //currently working at the around 4:20 mins left mark of the video
+            { //currently working at the around the 6:30 to 4:20 mins left mark of the video
                 var letters = encryptedMessageNoSpace.Select((value, index) => new { index, value }).Where(x => x.index % keyRange == 0).Select(x => x.value);
-                var letterCount = letters.Count();
                 var letterAmount = letters.GroupBy(x => x).Select(x => { var count = x.Count(); return new { x.Key, count }; });
+                var letterCount = 0;
+                foreach(var amount in letterAmount)
+                {
+                    letterCount += amount.count;
+                }
                 //when calculating the biggest number, need to deal with the cases where not all letters are present, so get a small freqNorm array without those missing letters
+                var letterPresentInValue = letterAmount.Select(x => x.Key - 65).ToArray(); //got the indexes 
+                var freqPresent = freqNorm.Select((freq, index) => new { index, freq }).Where(x => letterPresentInValue.Any(xx => xx == x.index)).ToArray();
+                double currentBigNumber = 0;
+                //when calculating the big number, need to remember to shift the freqPresent after each calculation, circular
+                //could it be done best by just manipulating indexes
+                //loop first for cicular
+                for (int n = 0; n < freqPresent.Length; n++)
+                {
+                    double temp = 0;
+                    var listOfLetters = new List<int>();
+                    for(int m = 0; m < letterPresentInValue.Length; m++) // Ensures that the letters have been shifted one to the left each time the main for-loop is run
+                    {
+                        listOfLetters.Add(letterPresentInValue[((m + n) % (freqPresent.Length))]); //should do the shifting here
+                    }
 
-
+                    for (int i = 0; i < freqPresent.Length; i++)
+                    { //
+                        var shiftedIndex = listOfLetters.ToArray()[i];
+                        var freq = freqPresent[i]; //refactor this loop to select the correct freq out from the key, currently it does not caring about shifting, it always selects the same
+                        var amount = letterAmount.First(x => shiftedIndex == (x.Key - 65)); //currently, these get selected in the order of freqNorm
+                        temp += freq.freq * ((double)amount.count / letterCount);
+                    }
+                    if (temp > currentBigNumber)
+                    {
+                        currentBigNumber = temp;
+                    }
+                }
             }
 
             throw new NotImplementedException();
